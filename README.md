@@ -7,7 +7,7 @@ This file must be downloaded as we use it in our notebook. Instructions for it a
 - **Usage -->** The python notebook "project__part_1.py" was done in Google Colab, therefore it is recommended to download it and execute it using Colab. We divided
   the notebook into 4 main blocks.
 ## Block 0 (Loading) 
-It's ust meant to be executed to do all the imports we need and load data. 
+It's just meant to be executed to do all the imports we need and load data. 
 ## Block 1 (Text Processing) 
 Here we start translating from tweets to translated_tweets, but it's very time-consuming, so we recommend not running the cells in "TRANSLATION HINDI TO ENGLISH
 (NOT REQUIRED TO EXECUTE)" and go directly to the next section "TO OPEN THE FILE WITH THE TRANSLATED TWEETS", where one should load the translated_tweet.json already
