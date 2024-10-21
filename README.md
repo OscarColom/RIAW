@@ -10,8 +10,7 @@ This file must be downloaded as we use it in our notebook. Instructions for it a
 It's just meant to be executed to do all the imports we need and load data. 
 ## Block 1 (Text Processing) 
 Here we start translating from tweets to translated_tweets, but it's very time-consuming, so we recommend not running the cells in "TRANSLATION HINDI TO ENGLISH
-(NOT REQUIRED TO EXECUTE)" and go directly to the next section "TO OPEN THE FILE WITH THE TRANSLATED TWEETS", where one should load the translated_tweet.json already
-downloaded from this repository and uploaded to Google Drive (change paths as needed). With this load, we can then execute all the remaining cells in the block where we do 
+(NOT REQUIRED TO EXECUTE)" and go directly to the next section "TO OPEN THE FILE WITH THE TRANSLATED TWEETS", where one should load the translated_tweet.json, you can download this file here: https://drive.google.com/file/d/1IvhXbLlRGY_M5ExfVrNq3dfcXPegmoCw/view?usp=drive_link and uploaded to Google Drive (change paths as needed). With this load, we can then execute all the remaining cells in the block where we do 
 the processing from the content of the tweets to clean processed terms. We also map the tweets with their doc ids, which will be of relevance for the next project part.
 ## Block 2 (Return) 
 In this block, we only create filtered_tweets and filtered_translated_tweets to retrieve only information of relevance, which is for each tweet its Tweet | Date | Hashtags| 
