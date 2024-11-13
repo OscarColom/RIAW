@@ -41,3 +41,20 @@ appears, then we go through some initial test queries and finally work with a fu
 
 ### Block 2 (Evaluation)
 This section will cover the evaluation metrics used to assess the performance of our analysis methods. We start defining functions for every metric and then test result with the csv for the 2 queries provided and finally for ours. To finish the notebook, we represented the tweets in a 2D plot using TSNE and tf-idf vectors. This part of the code requires much RAM and time, so although can be executed it is not recommendable, as the .ipynb has the plot already.
+
+
+
+## PART 3
+
+- **Description -->** In the 3rd part of the project, we provide different rankings based on tf-idf + cosine similarity, our own scoring + cosine similarity, BM25 and using Word2Vec model.
+- **Usage -->** The python notebook "project__part_3.py" was done in Google Colab, therefore it is recommended to download it and execute it using Colab. We divided
+  the notebook into 3 main blocks.
+  
+### Block 0 (Loading) 
+It's just meant to be executed to do all the imports we need and load data. 
+
+### Block 1 (Scorings)
+In this part, we reused our TF-IDF scoring system and combined it with cosine similarity to get a top-20 ranking of 2 test queries. Then, we created our own scoring based on popularity metrics such as number of likes, retweets, followers... and we combined it with the previous scoring to get another top-20. Finally, we made a top-20 ranking based on BM25 system and compared the similarities between the BM25 and the Tf-IDF systems.
+
+### Block 2 (Word-2-Vec + Cosine Similarity)
+This section covers the ranking of 5 test queries using a tweet-2-vec model using word2vec, this model is called tweetVec and can be used to compute the cosine similarity with each of the test queries to get the top-20 ranking for each of them.
