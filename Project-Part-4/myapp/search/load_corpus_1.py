@@ -1,7 +1,5 @@
 import pandas as pd
 import json
-import os
-
 
 from myapp.core.utils import load_json_file
 from myapp.search.objects import Document
@@ -9,32 +7,9 @@ from myapp.search.objects import Document
 _corpus = {}
 
 
-
-# Obtén el directorio donde se encuentra el archivo load_corpus.py
-base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-
-# Ahora construimos la ruta correcta a tweet_document_ids_map.csv
-docs_path_map = os.path.join(base_dir, 'tweet_document_ids_map.csv')
-# Cargar el archivo CSV
-df = pd.read_csv(docs_path_map)
-
-# Crear los mapas de docId a tweetId y de tweetId a docId
-doc_to_tweet_map = dict(zip(df['docId'], df['id']))  # mapa de docId a tweetId
-tweet_to_doc_map = dict(zip(df['id'], df['docId']))  # mapa de tweetId a docId
-
-
-
-
-
-
-
-
-
-
 def load_corpus(path) -> [Document]:
     """
-    Load file and transform to dictionary with each document as an object for easier treatment when needed for displaying
-     in results, stats, etc.
+    Load file and transform to dictionary with each document as an object for easier treatment when needed for displaying in results, stats, etc.
     :param path:
     :return:
     """
@@ -48,44 +23,41 @@ def _load_corpus_as_dataframe(path):
     Load documents corpus from file in 'path'
     :return:
     """
-        #json_data = load_json_file(path)
+    #json_data = load_json_file(path)
     with open(path) as fp:
         lines = fp.readlines()
     lines = [l.strip().replace(' +', ' ') for l in lines]
     tweets = [json.loads(line.strip()) for line in lines]
     json_data = tweets
-
-
+    
     tweets_df = _load_tweets_as_dataframe(json_data)
-    _clean_hashtags_and_urls(tweets_df)
+    #_clean_hashtags_and_urls(tweets_df)
     # Rename columns to obtain: Tweet | Username | Date | Hashtags | Likes | Retweets | Url | Language
-    corpus = tweets_df.rename(
-        columns={
-        "id": "Id", 
-        "content": "Tweet",  # Cambié full_text a content
-        "username": "Username", 
-        "created": "Date", 
-        "likeCount": "Likes",  # Cambié favorite_count a likeCount
-        "retweetCount": "Retweets", 
-        "lang": "Language"
-    })
+    #corpus = tweets_df.rename(columns={"id": "Id", "full_text": "Tweet", "screen_name": "Username", "created_at": "Date", "favorite_count": "Likes", "retweet_count": "Retweets", "lang": "Language"})
+
+    
+    corpus = tweets_df.rename(columns={"id": "Id", "content": "Tweet", "user": "Username", "date": "Date", "likeCount": "Likes", "retweetCount": "Retweets", "lang": "Language", "url": "Url"})
 
     # select only interesting columns
-    filter_columns = ["Id", "Tweet", "Username", "Date", "Likes", "Retweets", "Url", "Language"]
+
+    filter_columns = ["Id", "Tweet", "Date", "Retweets", "Hashtags", "Likes", "Url", "Language"] #"Username", 
     corpus = corpus[filter_columns]
     return corpus
 
 
-def _load_tweets_as_dataframe(json_data):
 
-    #print("JSON data preview:", json_data[:5])
+def _load_tweets_as_dataframe(json_data):
+    
     data = pd.DataFrame(json_data)
+    #data = data.transpose()
+    print(data.head())
+    print(data.columns)
+    data['Hashtags'] = None
     # parse entities as new columns
     #data = pd.concat([data.drop(['entities'], axis=1), data['entities'].apply(pd.Series)], axis=1)
     # parse user data as new columns and rename some columns to prevent duplicate column names
     data = pd.concat([data.drop(['user'], axis=1), data['user'].apply(pd.Series).rename(
-        columns={"created_at": "user_created_at", "id": "user_id", "id_str": "user_id_str", "lang": "user_lang"})],
-                     axis=1)
+        columns={"created_at": "user_created_at", "id": "user_id", "id_str": "user_id_str", "lang": "user_lang"})], axis=1)
     return data
 
 
@@ -111,11 +83,10 @@ def _build_url(row):
 
 
 def _clean_hashtags_and_urls(df):
-    print(df.columns)
-    #df["Hashtags"] = df["hashtags"].apply(_build_tags)
+    df["Hashtags"] = df["hashtags"].apply(_build_tags)
     df["Url"] = df.apply(lambda row: _build_url(row), axis=1)
     # df["Url"] = "TODO: get url from json"
-    #df.drop(columns=["entities"], axis=1, inplace=True)
+    df.drop(columns=["entities"], axis=1, inplace=True)
 
 
 def load_tweets_as_dataframe2(json_data):
@@ -156,6 +127,5 @@ def load_tweets_as_dataframe3(json_data):
 
 
 def _row_to_doc_dict(row: pd.Series):
-    _corpus[row['Id']] = Document(row['Id'], row['Tweet'][0:100], row['Tweet'], row['Date'], row['Likes'],
-                                  row['Retweets'],
-                                  row['Url'])
+    _corpus[row['Id']] = Document(row['Id'], row['Tweet'][0:100], row['Tweet'], row['Date'], row['Likes'], row['Retweets'], row['Url'], row['Hashtags'])
+    
