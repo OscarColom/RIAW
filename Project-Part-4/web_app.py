@@ -9,10 +9,10 @@ from flask import Flask, render_template, session
 from flask import request
 
 from myapp.analytics.analytics_data import AnalyticsData, ClickedDoc
-from myapp.search.load_corpus import load_corpus
+from myapp.search.load_corpus import load_corpus, tweet_to_doc_map
 from myapp.search.objects import Document, StatsDocument
 from myapp.search.search_engine import SearchEngine
-
+from myapp.search.algorithms import create_inverted_index_tfidf
 
 # *** for using method to_json in objects ***
 def _default(self, obj):
@@ -44,7 +44,7 @@ full_path = os.path.realpath(__file__)
 path, filename = os.path.split(full_path)
 # print(path + ' --> ' + filename + "\n")
 # load documents corpus into memory.
-file_path = path + "/tweets-data-who.json"
+file_path = path + "/json_test.json"
 
 
 
@@ -53,6 +53,11 @@ corpus = load_corpus(file_path)
 #print(corpus)
 print("loaded corpus. first elem:", list(corpus.values())[0])
 
+
+inv_index, tf, df, idf = create_inverted_index_tfidf(corpus, tweet_to_doc_map)
+# print('###########################################################')
+# print(inv_index)
+# print('###########################################################')
 
 # Home URL "/"
 @app.route('/')
@@ -84,7 +89,7 @@ def search_form_post():
 
     search_id = analytics_data.save_query_terms(search_query)
 
-    results = search_engine.search(search_query, search_id, corpus)
+    results = search_engine.search(search_query, search_id, corpus, inv_index, tf, df, idf)
 
     found_count = len(results)
     session['last_found_count'] = found_count
@@ -108,9 +113,18 @@ def doc_details():
 
     # get the query string parameters from request
     clicked_doc_id = request.args["id"]
-    p1 = int(request.args["search_id"])  # transform to Integer
-    p2 = int(request.args["param2"])  # transform to Integer
-    print("click in id={}".format(clicked_doc_id))
+    clicked_doc_id = int(clicked_doc_id)
+    
+    #p1 = int(request.args["search_id"])  # transform to Integer
+    #p2 = int(request.args["param2"])  # transform to Integer
+    #print("click in id={}".format(clicked_doc_id))
+
+    if clicked_doc_id in corpus:
+        document = corpus[clicked_doc_id]  # Obtener el documento usando su ID
+        print(f"Document found: {document}")
+    else:
+        return "Document not found", 404
+
 
     # store data in statistics table 1
     if clicked_doc_id in analytics_data.fact_clicks.keys():
@@ -120,7 +134,12 @@ def doc_details():
 
     print("fact_clicks count for id={} is {}".format(clicked_doc_id, analytics_data.fact_clicks[clicked_doc_id]))
 
-    return render_template('doc_details.html')
+    #return render_template('doc_details.html')
+    return render_template(
+        'doc_details.html',
+        document=document,  # Pasar el documento completo a la plantilla
+        click_count=analytics_data.fact_clicks[clicked_doc_id]  # También pasamos la estadística de clics
+    )
 
 
 @app.route('/stats', methods=['GET'])

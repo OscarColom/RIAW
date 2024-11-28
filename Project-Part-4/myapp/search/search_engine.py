@@ -1,8 +1,8 @@
 import random
 
 from myapp.search.objects import ResultItem, Document
-from myapp.search.algorithms import create_inverted_index_tfidf, rank_documents
-from myapp.search.load_corpus import tweet_to_doc_map, doc_to_tweet_map
+from myapp.search.algorithms import  rank_documents
+from myapp.search.load_corpus import  doc_to_tweet_map
 
 
 def build_demo_results(corpus: dict, search_id):
@@ -71,13 +71,14 @@ def build_demo_results(corpus: dict, search_id):
 class SearchEngine:
     """Educational search engine"""
 
-    def search(self, search_query, search_id, corpus):
+    def search(self, search_query, search_id, corpus, index, tf, df, idf):
         print("Search query:", search_query)
 
         # Crear el índice invertido y las métricas (tf, df, idf)
-        index, tf, df, idf = create_inverted_index_tfidf(corpus, tweet_to_doc_map)
+        #index, tf, df, idf = create_inverted_index_tfidf(corpus, tweet_to_doc_map)
 
         # Obtener la lista de documentos
+        
         docs = list(set(doc for postings in index.values() for doc, _ in postings))
 
         # Llamar a la función de ranking para obtener los documentos ordenados

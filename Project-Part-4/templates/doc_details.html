@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -11,5 +11,34 @@
 <div><a href="#" onclick="history.go(-4)">Go Back 4 pages</a></div>
 <div><a href="/stats" >Stats</a></div>
 <div><a href="/dashboard" >Dashboard</a></div>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document Detail - IRWA Search Engine</title>
+</head>
+<body>
+    <div>
+        <div><a href="#" onclick="history.go(-2)">Go Back</a></div>
+        <div><a href="/stats" >Stats</a></div>
+        <div><a href="/dashboard" >Dashboard</a></div>
+    </div>
+    
+    <h1>Document Details</h1>
+
+    <!-- Mostrar información del documento -->
+    <h2>{{ document.title }}</h2>
+    <p><strong>Description:</strong> {{ document.description }}</p>
+    <p><strong>Date:</strong> {{ document.doc_date }}</p>
+    <p><strong>Likes:</strong> {{ document.likes }}</p>
+    <p><strong>Retweets:</strong> {{ document.retweets }}</p>
+    <p><strong>URL:</strong> <a href="{{ document.url }}" target="_blank">{{ document.url }}</a></p>
+    <p><strong>ID:</strong> {{ document.id }}</p>
+    
+    <!-- Mostrar estadísticas -->
+    <p><strong>Number of clicks:</strong> {{ click_count }}</p>
 </body>
 </html>
