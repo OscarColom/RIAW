@@ -1,23 +1,27 @@
 {% extends "base.html" %}
 {% block page_title %}{{ page_title }}{% endblock %}
 {% block content %}
-    Found <strong>{{ found_counter }}</strong> results...
+    
+    <div class='centered'><small>Displaying <strong>{{ found_counter }}</strong> results for "<strong>{{ search_query }}</strong>"...</small></div>
     <hr>
     {% for item in results_list %}
         <div class="pb-3">
             <div class="doc-title">
-                <a href="{{ item.url }}">{{ item.title }}...
-                </a>
+                <a href="{{ item.url }}">{{ item.title }}...</a>
             </div>
-            <!-- <div class="cited">
-                <cite> <a href="{{ item.url }}">{{ item.url }}</a></cite>
-            </div> -->
+            <div class="doc-meta">
+                <small>
+                    Date: {{ item.doc_date }} | Likes: {{ item.likes }} | Retweets: {{ item.retweets }}
+                </small>
+            </div>
             <div class="doc-desc">
-                {{ item.doc_date }} — {{ item.description }}
+                <small>{{ item.description }}</small>
             </div>
-
+            <div class="doc-url">
+                <small>
+                    <a href="{{ item.url }}">{{ item.url }}</a>
+                </small>
+            </div>
         </div>
-
     {% endfor %}
 {% endblock %}
-

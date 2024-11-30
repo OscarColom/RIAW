@@ -21,8 +21,8 @@
 .btn-primary:hover,
 .btn-primary:not(:disabled):not(.disabled):active {
     /*color: #ffffff;*/
-    background-color: #c8102e;
-    border-color: #c8102e;
+    background-color: #10a0c8e6;
+    border-color: #10a0c8e6;
 }
 
 
@@ -34,7 +34,7 @@
 }
 
 input[type=submit] {
-    background-color: #c8102e;
+    background-color: #05c9f6df;
     border: none;
     color: white;
     padding: 15px 32px;
@@ -60,3 +60,35 @@ input[type=submit]:hover {
     font-size: 0.95em;
     adding-left: 5px;
 }
+
+
+
+/* Styling for document meta information (e.g., date) */
+.doc-meta {
+    font-size: 0.85em; /* Smaller font size for date */
+    color: gray; /* Optional: lighter color for distinction */
+}
+
+/* Styling for the document URL */
+.doc-url a {
+    font-size: 0.85em; /* Smaller font size for URL */
+    color: #1e90ff; /* Blue color for link */
+    text-decoration: none;
+    display: block; /* Ensure the URL appears on a new line */
+    margin-top: 5px; /* Add some space above */
+}
+
+.doc-url a:hover {
+    color: #00bfff; /* Lighter blue on hover */
+}
+
+/* Optional: Add some spacing between items */
+
+
+/* Increase spacing between items */
+.pb-3 {
+    padding-bottom: 15px; /* Increased padding */
+    margin-bottom: 20px; /* Optional: Add margin for more separation */
+    
+}
+

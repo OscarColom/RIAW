@@ -1,15 +1,63 @@
 {% extends "base.html" %}
 {% block page_title %}{{ page_title }}{% endblock %}
 {% block content %}
-    <h2>Quick Stats</h2>
-    <h4>Clicked docs:</h4>
+    
+    <div class='centered'><h2>Quick Stats</h2></div>
+    
+    <div class="pb-3">
 
-    {% for doc in clicks_data %}
-        <div class="pb-3">
-            <div class="">
-                <span class="text-dark"> ({{ doc.count }} visits) </span> — id: {{ doc.id }} — {{ doc.description }}
+        <!-- Total Clicks -->
+        <h4>Total Clicks:</h4>
+        <p>{{ total_clicks }}</p>
+
+        <!-- Total Searches -->
+        <h4>Total Searches:</h4>
+        <p>{{ total_searches }}</p>
+
+        <!-- Unique Visitors -->
+        <h4>Unique Visitors:</h4>
+        <p>{{ unique_visitors }}</p>
+
+        <!-- Average Clicks per Document -->
+        <h4>Average Clicks per Document:</h4>
+        <p>{{ average_clicks_per_doc }}</p>
+
+        <!-- Display Recent Searches -->
+        <h4>Recent Searches:</h4>
+        <ul>
+            {% for search in recent_searches %}
+                <li>{{ search }}</li>
+            {% endfor %}
+        </ul>
+
+        <!-- Display Clicked Docs -->
+        <h4>Clicked Docs:</h4>
+        {% for doc in clicks_data %}
+            <div class="pb-3">
+                <div class="">
+                    <span class="text-dark"> ({{ doc.count }} visits) </span> — id: {{ doc.id }} — {{ doc.description }}
+                </div>
             </div>
+            <hr>
+        {% endfor %}
+    </div>
+
+
+    <div class='centered'><h2>Search Query Analytics</h2></div>        
+
+    {% for query_data in analytics_queries %}
+        <div class="pb-3">
+            <div><strong>Search Query:</strong> {{ query_data.query }}</div>
+            <div><strong>Number of Terms:</strong> {{ query_data.num_terms }}</div>
+            <div><strong>Query Length:</strong> {{ query_data.query_length }} characters</div>
+            <div><strong>Term Order:</strong> {{ query_data.term_order | join(", ") }}</div>
+            <div><strong>Timestamp:</strong> {{ query_data.timestamp }}</div>
+            <div><strong>Visitor ID:</strong> {{ query_data.visitor_id }}</div>  
         </div>
         <hr>
     {% endfor %}
+
+    </div>
 {% endblock %}
+
+

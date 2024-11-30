@@ -14,6 +14,10 @@ from myapp.search.objects import Document, StatsDocument
 from myapp.search.search_engine import SearchEngine
 from myapp.search.algorithms import create_inverted_index_tfidf
 
+import uuid
+import time
+from datetime import datetime
+
 # *** for using method to_json in objects ***
 def _default(self, obj):
     return getattr(obj.__class__, "to_json", _default.default)(obj)
@@ -44,6 +48,8 @@ full_path = os.path.realpath(__file__)
 path, filename = os.path.split(full_path)
 # print(path + ' --> ' + filename + "\n")
 # load documents corpus into memory.
+
+#file_path = path + "/tweets-data-who.json"
 file_path = path + "/json_test.json"
 
 
@@ -81,22 +87,61 @@ def index():
     return render_template('index.html', page_title="Welcome")
 
 
+
 @app.route('/search', methods=['POST'])
 def search_form_post():
     search_query = request.form['search-query']
 
+    # Save the last search query to the session
     session['last_search_query'] = search_query
 
-    search_id = analytics_data.save_query_terms(search_query)
+    # Generate a unique visitor ID for the session if it doesn't exist
+    if 'visitor_id' not in session:
+        session['visitor_id'] = str(uuid.uuid4())  # Generate a unique UUID as visitor ID
 
+    # Store the search query in the session to track search history
+    if 'search_queries' not in session:
+        session['search_queries'] = []
+    
+    # Add the current search query to the search history
+    session['search_queries'].append(search_query)
+
+    # Limit search query history to the last 10 queries (for memory efficiency)
+    session['search_queries'] = session['search_queries'][-10:]
+
+    # Collect additional data
+    query_length = len(search_query)  # Total number of characters
+    num_terms = len(search_query.split())  # Number of terms in the search query
+    term_order = search_query.split()  # Terms in the order entered
+
+    # Create a timestamp for the search query
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    # Now save the query using the AnalyticsData instance
+    search_id = analytics_data.save_query_terms(
+        search_query, num_terms, query_length, term_order, session['visitor_id']
+    )
+
+    # Perform the search (keep the rest of your search logic as-is)
     results = search_engine.search(search_query, search_id, corpus, inv_index, tf, df, idf)
 
+    # Calculate the number of results found
     found_count = len(results)
     session['last_found_count'] = found_count
 
-    print(session)
+    # Render results with the search query and other stats
+    return render_template(
+        'results.html', 
+        results_list=results, 
+        page_title="Results", 
+        found_counter=found_count, 
+        search_query=search_query
+    )
 
-    return render_template('results.html', results_list=results, page_title="Results", found_counter=found_count)
+
+
+
+
 
 
 @app.route('/doc_details', methods=['GET'])
@@ -142,8 +187,8 @@ def doc_details():
     )
 
 
-@app.route('/stats', methods=['GET'])
-def stats():
+#@app.route('/stats', methods=['GET'])
+def stats_():
     """
     Show simple statistics example. ### Replace with dashboard ###
     :return:
@@ -162,6 +207,46 @@ def stats():
     docs.sort(key=lambda doc: doc.count, reverse=True)
     return render_template('stats.html', clicks_data=docs)
     # ### End replace with your code ###
+
+
+
+
+@app.route('/stats', methods=['GET'])
+def stats():
+    """
+    Show simple statistics example. ### Replace with dashboard ###
+    :return:
+    """
+
+    docs = []
+    total_clicks = 0
+    unique_visitors = len(session.keys())  # Assuming session stores unique users
+    total_searches = len(session.get('search_queries', []))  # Assuming search queries are saved in the session
+    recent_searches = session.get('search_queries', [])[-5:]  # Last 5 searches for display
+
+    for doc_id in analytics_data.fact_clicks:
+        row: Document = corpus[int(doc_id)]
+        count = analytics_data.fact_clicks[doc_id]
+        total_clicks += count
+        doc = StatsDocument(row.id, row.title, row.description, row.doc_date, row.url, count)
+        docs.append(doc)
+
+    # Calculate the average clicks per document
+    average_clicks_per_doc = total_clicks / len(docs) if docs else 0
+
+    # simulate sort by ranking
+    docs.sort(key=lambda doc: doc.count, reverse=True)
+    
+    # Pass statistics to the template
+    return render_template('stats.html', 
+                           clicks_data=docs, 
+                           total_clicks=total_clicks, 
+                           total_searches=total_searches,
+                           unique_visitors=unique_visitors,
+                           average_clicks_per_doc=average_clicks_per_doc,
+                           recent_searches=recent_searches)
+
+
 
 
 @app.route('/dashboard', methods=['GET'])
