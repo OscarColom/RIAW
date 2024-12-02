@@ -1,26 +1,54 @@
 {% extends "base.html" %}
 {% block page_title %}{{ page_title }}{% endblock %}
 {% block content %}
-    
-    <div class='centered'><h2>Quick Stats</h2></div>
-    
+
+
+    <h2>HTTP</h2>
     <div class="pb-3">
 
-        <!-- Total Clicks -->
-        <h4>Total Clicks:</h4>
-        <p>{{ total_clicks }}</p>
+        <!-- Requests Data -->
+        <h4>Requests Data:</h4>
+        <p>Total Requests: {{ total_requests }}</p>
 
-        <!-- Total Searches -->
-        <h4>Total Searches:</h4>
-        <p>{{ total_searches }}</p>
+        <!-- HTTP Sessions Data -->
+        <h4>HTTP Sessions Data:</h4>
+        <p>Unique Visitors: {{ unique_visitors }}</p>
 
-        <!-- Unique Visitors -->
-        <h4>Unique Visitors:</h4>
-        <p>{{ unique_visitors }}</p>
+        <!-- Clicks -->
+        <h4>Clicks:</h4>
+        <p>Total Clicks: {{ total_clicks }}</p>
 
         <!-- Average Clicks per Document -->
         <h4>Average Clicks per Document:</h4>
         <p>{{ average_clicks_per_doc }}</p>
+
+    </div>
+
+
+    <h2>Queries</h2>
+    <div class="pb-3">
+        {% if analytics_queries %}
+            {% for query_data in analytics_queries %}
+                <div>
+                    <strong>Query:</strong> {{ query_data['query'] }}<br>
+                    <strong>Number of Words:</strong> {{ query_data['num_words'] }}<br>
+                    <strong>Query Length:</strong> {{ query_data['query_length'] }} characters<br>
+                    <strong>Terms:</strong> {{ query_data['terms'] | join(", ") }}<br>
+                    <strong>Term Order:</strong> {{ query_data['term_order'] | join(", ") }}<br>
+                    <strong>Timestamp:</strong> {{ query_data['timestamp'] }}<br>
+                    <strong>Visitor ID:</strong> {{ query_data['visitor_id'] }}
+                </div>
+                <hr>
+            {% endfor %}
+        {% else %}
+            <p>No query analytics available at the moment.</p>
+        {% endif %}
+    </div>
+
+
+    <h2>Results (Documents)</h2>
+    <div class="pb-3">
+
 
         <!-- Display Recent Searches -->
         <h4>Recent Searches:</h4>
@@ -30,34 +58,39 @@
             {% endfor %}
         </ul>
 
-        <!-- Display Clicked Docs -->
-        <h4>Clicked Docs:</h4>
-        {% for doc in clicks_data %}
-            <div class="pb-3">
-                <div class="">
-                    <span class="text-dark"> ({{ doc.count }} visits) </span> — id: {{ doc.id }} — {{ doc.description }}
+        <!-- Clicks on Documents -->
+        <h4>Clicked Documents:</h4>
+        {% if clicks_data %}
+            {% for doc in clicks_data %}
+                <div>
+                    <span class="text-dark">({{ doc.count }} visits)</span>
+                    — id: {{ doc.id }} — {{ doc.description }}<br>
+                    <strong>Ranking:</strong> {{ doc.rank }}
+                    <strong>Query Related:</strong> {{ doc.query_related }}
+                    <strong>Dwell Time:</strong> {{ doc.dwell_time }} seconds
                 </div>
-            </div>
-            <hr>
-        {% endfor %}
+                <hr>
+            {% endfor %}
+        {% else %}
+            <p>No documents have been clicked yet.</p>
+        {% endif %}
+
+    </div>
+
+
+    <h2>User Context (Visitor)</h2>
+    <div class="pb-3">
+        <h4>Visitor Data:</h4>
+        <p>Browser: {{ visitor_data.browser }}</p>
+        <p>Operating System: {{ visitor_data.os }}</p>
+        <p>Device: {{ visitor_data.device }}</p>
+        <p>Time of the Day: {{ visitor_data.time_of_day }}</p>
+        <p>Date: {{ visitor_data.date }}</p>
+        
     </div>
 
 
-    <div class='centered'><h2>Search Query Analytics</h2></div>        
-
-    {% for query_data in analytics_queries %}
-        <div class="pb-3">
-            <div><strong>Search Query:</strong> {{ query_data.query }}</div>
-            <div><strong>Number of Terms:</strong> {{ query_data.num_terms }}</div>
-            <div><strong>Query Length:</strong> {{ query_data.query_length }} characters</div>
-            <div><strong>Term Order:</strong> {{ query_data.term_order | join(", ") }}</div>
-            <div><strong>Timestamp:</strong> {{ query_data.timestamp }}</div>
-            <div><strong>Visitor ID:</strong> {{ query_data.visitor_id }}</div>  
-        </div>
-        <hr>
-    {% endfor %}
-
-    </div>
+    
 {% endblock %}
 
 

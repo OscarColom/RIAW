@@ -12,11 +12,12 @@ from myapp.analytics.analytics_data import AnalyticsData, ClickedDoc
 from myapp.search.load_corpus import load_corpus, tweet_to_doc_map
 from myapp.search.objects import Document, StatsDocument
 from myapp.search.search_engine import SearchEngine
-from myapp.search.algorithms import create_inverted_index_tfidf
+from myapp.search.algorithms import create_inverted_index_tfidf, build_terms
 
 import uuid
 import time
 from datetime import datetime
+from user_agents import parse
 
 # *** for using method to_json in objects ***
 def _default(self, obj):
@@ -61,9 +62,7 @@ print("loaded corpus. first elem:", list(corpus.values())[0])
 
 
 inv_index, tf, df, idf = create_inverted_index_tfidf(corpus, tweet_to_doc_map)
-# print('###########################################################')
-# print(inv_index)
-# print('###########################################################')
+
 
 # Home URL "/"
 @app.route('/')
@@ -187,42 +186,40 @@ def doc_details():
     )
 
 
-#@app.route('/stats', methods=['GET'])
-def stats_():
-    """
-    Show simple statistics example. ### Replace with dashboard ###
-    :return:
-    """
-
-    docs = []
-    # ### Start replace with your code ###
-
-    for doc_id in analytics_data.fact_clicks:
-        row: Document = corpus[int(doc_id)]
-        count = analytics_data.fact_clicks[doc_id]
-        doc = StatsDocument(row.id, row.title, row.description, row.doc_date, row.url, count)
-        docs.append(doc)
-
-    # simulate sort by ranking
-    docs.sort(key=lambda doc: doc.count, reverse=True)
-    return render_template('stats.html', clicks_data=docs)
-    # ### End replace with your code ###
 
 
-
-
-@app.route('/stats', methods=['GET'])
+@app.route('/stats')
 def stats():
-    """
-    Show simple statistics example. ### Replace with dashboard ###
-    :return:
-    """
+    # Mocking total requests (to be replaced with a real tracking method)
+    total_requests = 1000
+
+    # HTTP Sessions Data
+    unique_visitors = len(session.keys())
+
+    # Gather Visitor Data
+    user_agent_string = request.headers.get('User-Agent')
+    
+    # Parse the user-agent string using user_agents library
+    user_agent = parse(user_agent_string)
+    
+    # Extract browser, OS, and device
+    browser = user_agent.browser.family
+    os = user_agent.os.family
+    device = "Mobile" if user_agent.is_mobile else "Desktop"
+    time_of_day = datetime.now().strftime('%H:%M:%S')
+    date = datetime.now().strftime('%Y-%m-%d')
+
+    visitor_data = {
+        'browser': browser,
+        'os': os,
+        'device': device,
+        'time_of_day': time_of_day,
+        'date': date
+    }
 
     docs = []
     total_clicks = 0
     unique_visitors = len(session.keys())  # Assuming session stores unique users
-    total_searches = len(session.get('search_queries', []))  # Assuming search queries are saved in the session
-    recent_searches = session.get('search_queries', [])[-5:]  # Last 5 searches for display
 
     for doc_id in analytics_data.fact_clicks:
         row: Document = corpus[int(doc_id)]
@@ -234,17 +231,25 @@ def stats():
     # Calculate the average clicks per document
     average_clicks_per_doc = total_clicks / len(docs) if docs else 0
 
-    # simulate sort by ranking
-    docs.sort(key=lambda doc: doc.count, reverse=True)
-    
-    # Pass statistics to the template
-    return render_template('stats.html', 
-                           clicks_data=docs, 
-                           total_clicks=total_clicks, 
-                           total_searches=total_searches,
-                           unique_visitors=unique_visitors,
-                           average_clicks_per_doc=average_clicks_per_doc,
-                           recent_searches=recent_searches)
+
+
+    return render_template(
+        'stats.html',
+        page_title="Quick Stats",
+        total_requests=total_requests,
+        total_clicks=total_clicks,
+        unique_visitors=unique_visitors,
+        average_clicks_per_doc=average_clicks_per_doc,
+        recent_searches=[query['query'] for query in analytics_data.queries[-11:]],
+        clicks_data=docs,
+        analytics_queries=analytics_data.queries,
+        visitor_data=visitor_data,
+    )
+
+
+
+
+
 
 
 

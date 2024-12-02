@@ -1,6 +1,7 @@
 import random
 import json
 from datetime import datetime
+from myapp.search.algorithms import build_terms
 
 
 
@@ -27,16 +28,19 @@ class AnalyticsData:
         query_data = {
             'search_id': search_id,
             'query': terms,
-            'num_terms': num_terms,
+            'num_words': num_terms,
             'query_length': query_length,
+            'terms': build_terms(terms),
+            'num_terms': len(build_terms(terms)),
             'term_order': term_order,
             'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'visitor_id': visitor_id
         }
         self.queries.append(query_data)
         return search_id
+    
 
-    def record_click(self, doc_id: str, description: str):
+    def record_click_(self, doc_id: str, description: str):
         """
         Record a click for a document.
         If the document exists in fact_clicks, increment the counter. Otherwise, initialize it.
@@ -45,6 +49,18 @@ class AnalyticsData:
             self.fact_clicks[doc_id].counter += 1
         else:
             self.fact_clicks[doc_id] = ClickedDoc(doc_id, description, 1)
+
+    def record_click(self, doc_id: str, description: str, rank=0, query_related=None):
+        """
+        Record a click for a document, along with ranking and related query data.
+        """
+        if doc_id in self.fact_clicks:
+            self.fact_clicks[doc_id].counter += 1
+        else:
+            self.fact_clicks[doc_id] = ClickedDoc(doc_id, description, 1, rank, query_related)
+
+
+
 
     def get_all_clicks(self):
         """
@@ -60,7 +76,8 @@ class AnalyticsData:
 
 
 
-class ClickedDoc:
+
+class ClickedDoc_:
     def __init__(self, doc_id, description, counter):
         self.doc_id = doc_id
         self.description = description
@@ -74,3 +91,19 @@ class ClickedDoc:
         Print the object content as a JSON string
         """
         return json.dumps(self)
+    
+class ClickedDoc:
+    def __init__(self, doc_id, description, counter, rank=0, query_related=None, dwell_time=0):
+        self.doc_id = doc_id
+        self.description = description
+        self.counter = counter
+        self.rank = rank
+        self.query_related = query_related
+        self.dwell_time = dwell_time
+
+    def to_json(self):
+        return self.__dict__
+
+    def __str__(self):
+        return json.dumps(self)
+
