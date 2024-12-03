@@ -86,7 +86,6 @@ def index():
     return render_template('index.html', page_title="Welcome")
 
 
-
 @app.route('/search', methods=['POST'])
 def search_form_post():
     search_query = request.form['search-query']
@@ -138,9 +137,22 @@ def search_form_post():
     )
 
 
+@app.route('/results', methods=['GET'])
+def results():
+    search_query = session.get('last_search_query')  # Retrieve the query from the session
+    if not search_query:
+        return "Search query is missing", 400  # Handle empty queries
 
+    results = search_engine.search(search_query, None, corpus, inv_index, tf, df, idf)
+    found_count = len(results)
 
-
+    return render_template(
+        'results.html',
+        results_list=results,
+        page_title="Results",
+        found_counter=found_count,
+        search_query=search_query
+    )
 
 
 @app.route('/doc_details', methods=['GET'])
