@@ -10,10 +10,6 @@ python -V
 cd search-engine-web-app
 python web_app.py
 ```
-The above will start a web server with the application:
-```
-
-
 
 
 
