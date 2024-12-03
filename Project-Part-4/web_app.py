@@ -10,7 +10,7 @@ from flask import request
 
 from myapp.analytics.analytics_data import AnalyticsData, ClickedDoc
 from myapp.search.load_corpus import load_corpus, tweet_to_doc_map
-from myapp.search.objects import Document, StatsDocument
+from myapp.search.objects import Document, StatsDocument, ResultItem, ResultItemStats
 from myapp.search.search_engine import SearchEngine
 from myapp.search.algorithms import create_inverted_index_tfidf, build_terms
 
@@ -51,8 +51,7 @@ path, filename = os.path.split(full_path)
 # load documents corpus into memory.
 
 #file_path = path + "/tweets-data-who.json"
-file_path = path + "/json_test.json"
-
+file_path = path + "/tweets-data-who.json"
 
 
 # file_path = "../../tweets-data-who.json"
@@ -123,6 +122,8 @@ def search_form_post():
     # Perform the search (keep the rest of your search logic as-is)
     results = search_engine.search(search_query, search_id, corpus, inv_index, tf, df, idf)
 
+    session['last_results'] = [result.__dict__ for result in results]
+
     # Calculate the number of results found
     found_count = len(results)
     session['last_found_count'] = found_count
@@ -171,16 +172,12 @@ def doc_details():
     clicked_doc_id = request.args["id"]
     clicked_doc_id = int(clicked_doc_id)
     
-    #p1 = int(request.args["search_id"])  # transform to Integer
-    #p2 = int(request.args["param2"])  # transform to Integer
-    #print("click in id={}".format(clicked_doc_id))
 
     if clicked_doc_id in corpus:
         document = corpus[clicked_doc_id]  # Obtener el documento usando su ID
         print(f"Document found: {document}")
     else:
         return "Document not found", 404
-
 
     # store data in statistics table 1
     if clicked_doc_id in analytics_data.fact_clicks.keys():
@@ -233,16 +230,31 @@ def stats():
     total_clicks = 0
     unique_visitors = len(session.keys())  # Assuming session stores unique users
 
+    # Recuperar resultados y query de la sesión
+    results = session.get('last_results', [])
+    search_query = session.get('last_search_query', "No Query Found")
+
     for doc_id in analytics_data.fact_clicks:
-        row: Document = corpus[int(doc_id)]
-        count = analytics_data.fact_clicks[doc_id]
-        total_clicks += count
-        doc = StatsDocument(row.id, row.title, row.description, row.doc_date, row.url, count)
-        docs.append(doc)
+        # Buscar el documento por ID
+        row = next((result for result in results if result['id'] == doc_id), None)
+
+        if row:  # Si el documento existe
+            count = analytics_data.fact_clicks[doc_id]
+            total_clicks += count
+            doc = ResultItemStats(
+                row['id'],
+                row['title'],
+                row['description'],
+                row['doc_date'],
+                row['url'],
+                row['ranking'][0],  # Valor numérico del ranking
+                count,  # Número de visitas (puedes obtenerlo del diccionario 'analytics_data.fact_clicks')
+                search_query
+            )
+            docs.append(doc)
 
     # Calculate the average clicks per document
     average_clicks_per_doc = total_clicks / len(docs) if docs else 0
-
 
 
     return render_template(
@@ -257,12 +269,6 @@ def stats():
         analytics_queries=analytics_data.queries,
         visitor_data=visitor_data,
     )
-
-
-
-
-
-
 
 
 

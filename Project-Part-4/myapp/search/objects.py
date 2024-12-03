@@ -54,3 +54,16 @@ class ResultItem:
         self.doc_date = doc_date
         self.url = url
         self.ranking = ranking
+
+
+class ResultItemStats:
+    def __init__(self, id, title, description, doc_date, url, ranking, count=None, query_related=None, dwell_time=None):
+        self.id = id
+        self.title = title
+        self.description = description
+        self.doc_date = doc_date
+        self.url = url
+        self.ranking = ranking
+        self.count = count  
+        self.query_related = query_related  
+        self.dwell_time = dwell_time 

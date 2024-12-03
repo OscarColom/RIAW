@@ -65,9 +65,15 @@
                 <div>
                     <span class="text-dark">({{ doc.count }} visits)</span>
                     — id: {{ doc.id }} — {{ doc.description }}<br>
-                    <strong>Ranking:</strong> {{ doc.rank }}
-                    <strong>Query Related:</strong> {{ doc.query_related }}
-                    <strong>Dwell Time:</strong> {{ doc.dwell_time }} seconds
+                    <div style="margin-bottom: 10px;">
+                        <strong>Ranking:</strong> {{ doc.ranking }}
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <strong>Query Related:</strong> {{ doc.query_related }}
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <strong>Dwell Time:</strong> {{ doc.dwell_time }} seconds
+                    </div>
                 </div>
                 <hr>
             {% endfor %}

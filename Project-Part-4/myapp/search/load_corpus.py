@@ -10,24 +10,12 @@ _corpus = {}
 
 
 
-# Obtén el directorio donde se encuentra el archivo load_corpus.py
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-
-# Ahora construimos la ruta correcta a tweet_document_ids_map.csv
 docs_path_map = os.path.join(base_dir, 'tweet_document_ids_map.csv')
-# Cargar el archivo CSV
 df = pd.read_csv(docs_path_map)
 
-# Crear los mapas de docId a tweetId y de tweetId a docId
 doc_to_tweet_map = dict(zip(df['docId'], df['id']))  # mapa de docId a tweetId
 tweet_to_doc_map = dict(zip(df['id'], df['docId']))  # mapa de tweetId a docId
-
-
-
-
-
-
-
 
 
 
