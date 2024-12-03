@@ -198,8 +198,6 @@ def doc_details():
     )
 
 
-
-
 @app.route('/stats')
 def stats():
     # Mocking total requests (to be replaced with a real tracking method)
@@ -243,8 +241,6 @@ def stats():
     # Calculate the average clicks per document
     average_clicks_per_doc = total_clicks / len(docs) if docs else 0
 
-
-
     return render_template(
         'stats.html',
         page_title="Quick Stats",
@@ -257,13 +253,6 @@ def stats():
         analytics_queries=analytics_data.queries,
         visitor_data=visitor_data,
     )
-
-
-
-
-
-
-
 
 
 @app.route('/dashboard', methods=['GET'])
