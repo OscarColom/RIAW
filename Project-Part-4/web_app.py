@@ -51,7 +51,7 @@ path, filename = os.path.split(full_path)
 # load documents corpus into memory.
 
 #file_path = path + "/tweets-data-who.json"
-file_path = path + "/tweets-data-who.json"
+file_path = path + "/farmers-protest-tweets.json"
 
 
 # file_path = "../../tweets-data-who.json"
