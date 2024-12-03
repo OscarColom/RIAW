@@ -58,3 +58,7 @@ In this part, we reused our TF-IDF scoring system and combined it with cosine si
 
 ### Block 2 (Word-2-Vec + Cosine Similarity)
 This section covers the ranking of 5 test queries using a tweet-2-vec model using word2vec, this model is called tweetVec and can be used to compute the cosine similarity with each of the test queries to get the top-20 ranking for each of them.
+
+
+## PART 4
+The README for part 4 is inside the Project-Part-4 folder.
